@@ -1,16 +1,17 @@
-import genealopy as gp
+```py
+import genealopy as gy
 
 # Defining some individuals
 
-father = gp.Individual(firstname="Naruto", lastname="Uzumaki")
-mother = gp.Individual(firstname="Hinata", lastname="Hyuga")
-child1 = gp.Individual(firstname="Boruto", lastname="Uzumaki")
-child2 = gp.Individual(firstname="Himawari", lastname="Uzumaki")
+father = gy.Individual(firstname="Naruto", lastname="Uzumaki")
+mother = gy.Individual(firstname="Hinata", lastname="Hyuga")
+child1 = gy.Individual(firstname="Boruto", lastname="Uzumaki")
+child2 = gy.Individual(firstname="Himawari", lastname="Uzumaki")
 children = [child1, child2]
 
 # Defining a family & adding the individuals
 
-family = gp.Family()
+family = gy.Family()
 family.set_father(father)
 family.set_mother(mother)
 family.set_children(children)
@@ -36,9 +37,9 @@ print(f"The mother of {child2.get_firstname()} is {child2.get_familyaschild().ge
 
 # Adding another family and displaying their informations
 
-another_family = gp.Family()
-another_father = gp.Individual(firstname="Minato", lastname="Namikaze")
-another_mother = gp.Individual(firstname="Kushina", lastname="Uzumaki")
+another_family = gy.Family()
+another_father = gy.Individual(firstname="Minato", lastname="Namikaze")
+another_mother = gy.Individual(firstname="Kushina", lastname="Uzumaki")
 another_family.set_father(another_father)
 another_family.set_mother(another_mother)
 another_family.set_children(father)
@@ -49,4 +50,16 @@ print(f"The children of the other family are {[child.get_firstname() for child i
 
 # Generate a mermaid diagram
 
-print(gp.generate_diagram([family, another_family]))
+print(gy.generate_diagram([family, another_family]))
+```
+
+```mermaid
+graph TD
+    Naruto --> F0
+    Hinata --> F0
+    F0 --> Boruto
+    F0 --> Himawari
+    Minato --> F1
+    Kushina --> F1
+    F1 --> Naruto
+```
