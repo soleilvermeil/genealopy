@@ -72,7 +72,33 @@ class Individual:
             families.set_father(self,ignore_recursion=True)
         else:
             raise Exception("'children' must either be a Family or a list of Family.")
-    
+    def set_familiesasmother(self, families: Union[Family, list]) -> None:
+        if type(families) == list:
+            self.familiesasmother = families
+        elif type(families) == Family:
+            self.familiesasmother = [families]
+        for f in self.familiesasmother:
+            f.set_mother(self, ignore_recursion=True)
+        else:
+            raise Exception("'children' must either be a Family or a list of Family.")
+    def add_familiesasmother(self, families: Union[Family, list], ignore_recursion = False) -> None:
+        if type(families) == list:
+            for f in families:
+                self.familiesasmother.append(f)
+                if not ignore_recursion:
+                    f.set_mother(self, ignore_recursion=True)
+        elif type(families) == Family:
+            self.familiesasmother.append(families)
+            families.set_mother(self,ignore_recursion=True)
+        else:
+            raise Exception("'children' must either be a Family or a list of Family.")
+    def set_familyaschild(self, family: Family, ignore_recursion = False) -> None:
+        self.familyaschild = family
+        if not ignore_recursion:
+            family.add_children(self, ignore_recursion=True)
+
+    # Getters
+
     def get_firstname(self) -> str:
         return self.firstname
     def get_lastname(self) -> str:
@@ -111,20 +137,25 @@ class Family:
         
     # Setters
     
-    def set_father(self, father: Individual, ignore_recursion=False):
+    def set_father(self, father: Individual, ignore_recursion=False) -> None:
         self.father = father
         if not ignore_recursion:
             father.add_familiesasfather(self, ignore_recursion=True)
-    def set_mother(self, mother):
+    def set_mother(self, mother: Individual, ignore_recursion=False) -> None:
         self.mother = mother
-    def set_children(self, children: Union[Individual, list]):
+        if not ignore_recursion:
+            mother.add_familiesasmother(self, ignore_recursion=True)
+    def set_children(self, children: Union[Individual, list], ignore_recursion=False) -> None:
         if type(children) is list:
             self.children = children
         elif type(children) is Individual:
             self.children = [children]
         else:
             raise Exception(f"'children' must either be an Individual or a list of Individual.")
-    def add_children(self, children: Union[Individual, list]):
+        if not ignore_recursion:
+            for child in self.children:
+                child.set_familyaschild(self, ignore_recursion=True)
+    def add_children(self, children: Union[Individual, list], ignore_recursion=False) -> None:
         if type(children) is list:
             for child in children:
                 self.children.append(child)
@@ -132,6 +163,9 @@ class Family:
             self.children.append(children)
         else:
             raise Exception(f"'children' must either be an Individual or a list of Individual.")
+        if not ignore_recursion:
+            for child in self.children:
+                child.set_familyaschild(self, ignore_recursion=True)
         
     # Getters
     
@@ -141,3 +175,15 @@ class Family:
         return self.mother
     def get_children(self) -> list:
         return self.children
+    
+def generate_diagram(families: list) -> str:
+    result = "graph TD"
+    for family_index, family in enumerate(families):
+        father = family.get_father()
+        if father is not None: result += f"\n    {father.get_firstname()} --> F{family_index}"
+        mother = family.get_mother()
+        if mother is not None: result += f"\n    {mother.get_firstname()} --> F{family_index}"
+        children = family.get_children()
+        for child in children:
+            result += f"\n    F{family_index} --> {child.get_firstname()}"
+    return result
